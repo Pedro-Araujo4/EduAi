@@ -1,6 +1,6 @@
 """
 Sistema Inteligente de Análise Educacional
-Executar:  streamlit run app.py
+Executar:  streamlit run app.py ou python -m streamlit run app.py 
 Dependências: pip install streamlit scikit-learn scikit-fuzzy pandas numpy scipy networkx
 """
 import os

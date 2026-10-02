@@ -28,5 +28,5 @@ Certifique-se de ter o Python instalado na sua máquina. Siga os passos abaixo p
 
 **1. Instale as dependências necessárias:**
 ```bash
-pip install streamlit scikit-learn scikit-fuzzy pandas numpy scipy networkx plotly anthropic
-streamlit run app.py ou python -m streamlit run app.py   
+Executar:  streamlit run app.py ou python -m streamlit run app.py 
+Dependências: pip install streamlit scikit-learn scikit-fuzzy pandas numpy scipy networkx  
