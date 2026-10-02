@@ -315,45 +315,6 @@ def estado_knn(viz):
     return "alerta" if risco >= 2 else "atencao" if risco == 1 or atenc >= 2 else "ok"
 
 
-# ------------------------------------------------------- Assistente (chat)
-def contexto_aluno(res):
-    e = res["entrada"]
-    padroes = "; ".join(
-        f"{c:.0%} dos históricos com [{', '.join(ITEM_TXT[i] for i in sorted(its))}] reprovaram"
-        for its, _, c, _ in res["apriori"]) or "nenhum"
-    return (f"Dados do aluno: nota {e['nota']}, frequência {e['freq']}%, tarefas entregues {e['tarefas']}%, "
-            f"estudo extra {e['estudo']}h/semana, faltas às segundas: {'sim' if e['seg'] else 'não'}.\n"
-            f"Risco geral: {res['nivel']} ({res['score']:.0f}/100). Nota final projetada: {res['reg']:.1f}. "
-            f"Perfil (K-Means): {res['kmeans']}. Árvore de decisão: {res['arvore'][0]}. "
-            f"Intervenção (fuzzy): {res['fuzzy'][1]}. Regras do especialista: {res['especialista'] or 'nenhuma'}. "
-            f"Padrões do histórico: {padroes}. Ponto mais fraco: {res['ponto_fraco']}. "
-            f"Abordagem inicial sugerida: {res['abordagem']}")
-
-
-def chamar_assistente(historico, res):
-    key = os.getenv("ANTHROPIC_API_KEY")
-    if not key:
-        try:
-            key = st.secrets["ANTHROPIC_API_KEY"]
-        except Exception:
-            key = None
-    if not key:
-        return ("O assistente precisa da variável de ambiente `ANTHROPIC_API_KEY` (ou `st.secrets`). "
-                f"Enquanto isso, a abordagem sugerida pelo agente é: {res['abordagem']}")
-    try:
-        import anthropic
-        sistema = ("Você é um assistente pedagógico para professores e coordenadores. Responda em português, "
-                   "de forma prática, concreta e concisa, com base APENAS nos dados e resultados abaixo. "
-                   "Os dados não trazem informação por disciplina: se perguntarem sobre uma disciplina "
-                   "específica, adapte as estratégias gerais e diga isso. Não faça diagnósticos clínicos; "
-                   "sugira encaminhamento a profissionais quando apropriado.\n\n" + contexto_aluno(res))
-        msg = anthropic.Anthropic(api_key=key).messages.create(
-            model=MODELO, max_tokens=800, system=sistema, messages=historico)
-        return msg.content[0].text
-    except Exception as ex:
-        return f"Não consegui contatar o assistente ({type(ex).__name__}). Tente novamente."
-
-
 # ------------------------------------------------------- Navegação (sidebar)
 st.session_state.setdefault("pagina", "Início")
 st.session_state.setdefault("conf_min", 0.6)
